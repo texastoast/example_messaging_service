@@ -8,7 +8,7 @@ defmodule MessagingService.Schemas.ContactPhoneNumber do
   @type t :: %__MODULE__{}
 
   schema "contact_phone_numbers" do
-    field :phone_number, :string
+    field :number, :string
 
     belongs_to :contact, MessagingService.Schemas.Contact
 
@@ -18,7 +18,7 @@ defmodule MessagingService.Schemas.ContactPhoneNumber do
   @spec changeset(MessagingService.Schemas.ContactPhoneNumber.t(), map()) :: Ecto.Changeset.t()
   def changeset(contact_phone_number, attrs) do
     contact_phone_number
-    |> cast(attrs, [:phone_number, :contact_id])
-    |> validate_required([:phone_number, :contact_id])
+    |> cast(attrs, [:number, :contact_id])
+    |> validate_required([:number, :contact_id])
   end
 end
