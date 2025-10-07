@@ -4,17 +4,44 @@ defmodule MessagingService.Providers.Sms do
   """
   @behaviour MessagingService.Providers.Behaviour
 
+  alias MessagingService.Repo
   alias MessagingService.Schemas.Message
+  alias MessagingService.Messages
 
-  @spec send_message(Message.t()) :: {:ok, Message.t()} | {:error, map()}
+  @impl MessagingService.Providers.Behaviour
   def send_message(message) do
-    # TODO: Implement SMS send
-    {:ok, message}
+    {:ok, response} =
+      Req.post("http://localhost:4000/api/webhooks/mock_send_response",
+        json: JSON.encode!(message)
+      )
+
+    new_message_assocs = Messages.get_new_message_assocs(message)
+
+    case response.status do
+      n when n in 200..299 ->
+        Repo.insert(
+          Message.changeset(
+            %Message{},
+            Map.merge(new_message_assocs, ExUtils.Map.atomize_keys(message))
+          )
+        )
+
+        {:ok, response.body}
+
+      _ ->
+        {:error, response}
+    end
   end
 
-  @spec receive_message(Message.t()) :: {:ok, Message.t()} | {:error, map()}
+  @impl MessagingService.Providers.Behaviour
   def receive_message(message) do
-    # TODO: Implement SMS receive
-    {:ok, message}
+    new_message_assocs = Messages.get_new_message_assocs(message)
+
+    Repo.insert(
+      Message.changeset(
+        %Message{},
+        Map.merge(new_message_assocs, ExUtils.Map.atomize_keys(message))
+      )
+    )
   end
 end

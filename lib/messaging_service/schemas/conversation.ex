@@ -9,16 +9,16 @@ defmodule MessagingService.Schemas.Conversation do
 
   schema "conversations" do
     has_many :messages, MessagingService.Schemas.Message
-    belongs_to :from_contact, MessagingService.Schemas.Contact
-    belongs_to :to_contact, MessagingService.Schemas.Contact
+
+    many_to_many :contacts, MessagingService.Schemas.Contact,
+      join_through: "contacts_conversations"
 
     timestamps()
   end
 
   @spec changeset(MessagingService.Schemas.Conversation.t(), map()) :: Ecto.Changeset.t()
-  def changeset(conversation, attrs) do
+  def changeset(conversation, attrs \\ %{}) do
     conversation
-    |> cast(attrs, [:from_contact_id, :to_contact_id])
-    |> validate_required([:from_contact_id, :to_contact_id])
+    |> cast(attrs, [])
   end
 end

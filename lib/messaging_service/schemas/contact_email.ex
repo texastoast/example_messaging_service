@@ -5,7 +5,6 @@ defmodule MessagingService.Schemas.ContactEmail do
   use MessagingService.Schema
   import Ecto.Changeset
 
-
   @type t :: %__MODULE__{}
 
   schema "contact_emails" do

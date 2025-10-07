@@ -3,23 +3,31 @@ defmodule MessagingService.Providers.Provider do
   The outward interface for interacting with a provider integration.
   """
 
-  alias MessagingService.Schemas.Message
-  alias MessagingService.Structs.NewMessage
-
   @type provider :: :sms | :mms | :email
 
-
-  @spec send_message(NewMessage.t()) :: {:ok, Message.t()} | {:error, map()}
+  @spec send_message(map()) :: {:ok, map()} | {:error, map()}
   def send_message(message) do
-    get_provider(message.type).send_message(message)
+    case get_provider(Map.get(message, "type")).send_message(message) do
+      {:ok, response} ->
+        {:ok, response}
+
+      {:error, response} ->
+        {:error, response}
+    end
   end
 
-  @spec receive_message(NewMessage.t()) :: {:ok, Message.t()} | {:error, map()}
+  @spec receive_message(map()) :: {:ok, map()} | {:error, map()}
   def receive_message(message) do
-    get_provider(message.type).receive_message(message)
+    case get_provider(Map.get(message, "type")).receive_message(message) do
+      {:ok, message} ->
+        {:ok, message}
+
+      {:error, response} ->
+        {:error, response}
+    end
   end
 
-  defp get_provider(:sms), do: MessagingService.Providers.Sms
-  defp get_provider(:mms), do: MessagingService.Providers.Mms
-  defp get_provider(:email), do: MessagingService.Providers.Email
+  defp get_provider("sms"), do: MessagingService.Providers.Sms
+  defp get_provider("mms"), do: MessagingService.Providers.Mms
+  defp get_provider("email"), do: MessagingService.Providers.Email
 end

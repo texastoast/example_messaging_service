@@ -20,10 +20,15 @@ defmodule MessagingServiceWeb.Router do
     get "/", PageController, :home
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", MessagingServiceWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", MessagingServiceWeb do
+    pipe_through :api
+
+    get "/conversations", WebhooksController, :get_conversations
+    get "/conversations/:id/messages", WebhooksController, :get_messages_for_conversation
+    post "/messages/:type", WebhooksController, :send_message
+    post "/webhooks/mock_send_response", WebhooksController, :mock_send_response
+    post "/webhooks/:type", WebhooksController, :receive_message
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:messaging_service, :dev_routes) do

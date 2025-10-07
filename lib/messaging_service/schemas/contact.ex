@@ -13,6 +13,9 @@ defmodule MessagingService.Schemas.Contact do
     has_many :contact_emails, MessagingService.Schemas.ContactEmail
     has_many :contact_phone_numbers, MessagingService.Schemas.ContactPhoneNumber
 
+    many_to_many :conversations, MessagingService.Schemas.Conversation,
+      join_through: "contacts_conversations"
+
     timestamps()
   end
 

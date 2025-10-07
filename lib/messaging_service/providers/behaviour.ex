@@ -3,15 +3,13 @@ defmodule MessagingService.Providers.Behaviour do
   Defines the callbacks to be implemented by any messaging provider.
   """
 
-  alias MessagingService.Schemas.Message
-
   @doc """
   Sends a message to the provider.
   """
-  @callback send_message(message :: Message.t()) :: {:ok, Message.t()} | {:error, map()}
+  @callback send_message(message :: map()) :: {:ok, map()} | {:error, map()}
 
   @doc """
   Receives a message from the provider.
   """
-  @callback receive_message(message :: Message.t()) :: {:ok, Message.t()} | {:error, map()}
+  @callback receive_message(message :: map()) :: {:ok, map()} | {:error, map()}
 end
