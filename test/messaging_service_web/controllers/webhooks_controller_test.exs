@@ -53,16 +53,17 @@ defmodule MessagingServiceWeb.WebhooksControllerTest do
         assert url == "http://localhost:4000/api/webhooks/mock_send_response"
         assert opts[:json] == Jason.encode!(params)
 
-        {:ok, %Req.Response{
-          status: 200,
-          body: %{
-            "type" => "sms",
-            "body" => params["body"],
-            "from" => params["from"],
-            "to" => params["to"],
-            "messaging_provider_id" => Ecto.UUID.generate()
-          }
-        }}
+        {:ok,
+         %Req.Response{
+           status: 200,
+           body: %{
+             "type" => "sms",
+             "body" => params["body"],
+             "from" => params["from"],
+             "to" => params["to"],
+             "messaging_provider_id" => Ecto.UUID.generate()
+           }
+         }}
       end)
 
       conn = post(conn, ~p"/api/messages/sms", params)
@@ -81,17 +82,18 @@ defmodule MessagingServiceWeb.WebhooksControllerTest do
         assert url == "http://localhost:4000/api/webhooks/mock_send_response"
         assert opts[:json] == Jason.encode!(params)
 
-        {:ok, %Req.Response{
-          status: 200,
-          body: %{
-            "type" => "mms",
-            "body" => params["body"],
-            "from" => params["from"],
-            "to" => params["to"],
-            "attachments" => params["attachments"],
-            "messaging_provider_id" => Ecto.UUID.generate()
-          }
-        }}
+        {:ok,
+         %Req.Response{
+           status: 200,
+           body: %{
+             "type" => "mms",
+             "body" => params["body"],
+             "from" => params["from"],
+             "to" => params["to"],
+             "attachments" => params["attachments"],
+             "messaging_provider_id" => Ecto.UUID.generate()
+           }
+         }}
       end)
 
       conn = post(conn, ~p"/api/messages/mms", params)
@@ -110,17 +112,18 @@ defmodule MessagingServiceWeb.WebhooksControllerTest do
         assert url == "http://localhost:4000/api/webhooks/mock_send_response"
         assert opts[:json] == Jason.encode!(params)
 
-        {:ok, %Req.Response{
-          status: 200,
-          body: %{
-            "type" => "email",
-            "body" => params["body"],
-            "from" => params["from"],
-            "to" => params["to"],
-            "subject" => params["subject"],
-            "messaging_provider_id" => Ecto.UUID.generate()
-          }
-        }}
+        {:ok,
+         %Req.Response{
+           status: 200,
+           body: %{
+             "type" => "email",
+             "body" => params["body"],
+             "from" => params["from"],
+             "to" => params["to"],
+             "subject" => params["subject"],
+             "messaging_provider_id" => Ecto.UUID.generate()
+           }
+         }}
       end)
 
       conn = post(conn, ~p"/api/messages/email", params)
@@ -147,17 +150,18 @@ defmodule MessagingServiceWeb.WebhooksControllerTest do
         expected_params = Map.put(params, "type", "mms")
         assert opts[:json] == Jason.encode!(expected_params)
 
-        {:ok, %Req.Response{
-          status: 200,
-          body: %{
-            "type" => "mms",
-            "body" => params["body"],
-            "from" => params["from"],
-            "to" => params["to"],
-            "attachments" => params["attachments"],
-            "messaging_provider_id" => Ecto.UUID.generate()
-          }
-        }}
+        {:ok,
+         %Req.Response{
+           status: 200,
+           body: %{
+             "type" => "mms",
+             "body" => params["body"],
+             "from" => params["from"],
+             "to" => params["to"],
+             "attachments" => params["attachments"],
+             "messaging_provider_id" => Ecto.UUID.generate()
+           }
+         }}
       end)
 
       conn = post(conn, ~p"/api/messages/sms", params)
@@ -213,16 +217,17 @@ defmodule MessagingServiceWeb.WebhooksControllerTest do
         assert url == "http://localhost:4000/api/webhooks/mock_send_response"
         assert opts[:json] == Jason.encode!(params)
 
-        {:ok, %Req.Response{
-          status: 200,
-          body: %{
-            "type" => "sms",
-            "body" => params["body"],
-            "from" => params["from"],
-            "to" => params["to"],
-            "messaging_provider_id" => Ecto.UUID.generate()
-          }
-        }}
+        {:ok,
+         %Req.Response{
+           status: 200,
+           body: %{
+             "type" => "sms",
+             "body" => params["body"],
+             "from" => params["from"],
+             "to" => params["to"],
+             "messaging_provider_id" => Ecto.UUID.generate()
+           }
+         }}
       end)
 
       conn = post(conn, ~p"/api/messages/sms", params)

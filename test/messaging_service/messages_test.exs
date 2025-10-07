@@ -162,10 +162,10 @@ defmodule MessagingService.MessagesTest do
     end
   end
 
-
   defp insert_conversation_contact(conversation, contact) do
     conversation = Repo.preload(conversation, :contacts)
     existing_contacts = conversation.contacts
+
     conversation
     |> Ecto.Changeset.change()
     |> Ecto.Changeset.put_assoc(:contacts, existing_contacts ++ [contact])

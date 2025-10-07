@@ -17,17 +17,18 @@ defmodule MessagingService.Providers.EmailTest do
       assert url == "http://localhost:4000/api/webhooks/mock_send_response"
       assert opts[:json] == Jason.encode!(message)
 
-      {:ok, %Req.Response{
-        status: 200,
-        body: %{
-          "type" => message["type"],
-          "body" => message["body"],
-          "from" => message["from"],
-          "to" => message["to"],
-          "subject" => message["subject"],
-          "messaging_provider_id" => Ecto.UUID.generate()
-        }
-      }}
+      {:ok,
+       %Req.Response{
+         status: 200,
+         body: %{
+           "type" => message["type"],
+           "body" => message["body"],
+           "from" => message["from"],
+           "to" => message["to"],
+           "subject" => message["subject"],
+           "messaging_provider_id" => Ecto.UUID.generate()
+         }
+       }}
     end)
   end
 
@@ -49,6 +50,7 @@ defmodule MessagingService.Providers.EmailTest do
         "to" => "recipient@example.com",
         "subject" => "Test Subject"
       }
+
       mock_http_request(message)
 
       result = Email.send_message(message)
@@ -63,6 +65,7 @@ defmodule MessagingService.Providers.EmailTest do
         "from" => "sender@example.com",
         "to" => "recipient@example.com"
       }
+
       mock_http_request(message)
 
       result = Email.send_message(message)

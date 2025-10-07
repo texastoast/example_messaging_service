@@ -10,7 +10,8 @@ defmodule MessagingService.Providers.Sms do
 
   @impl MessagingService.Providers.Behaviour
   def send_message(message) do
-    http_client = Application.get_env(:messaging_service, :http_client, MessagingService.HTTPClientMock)
+    http_client =
+      Application.get_env(:messaging_service, :http_client, MessagingService.HTTPClientMock)
 
     {:ok, response} =
       http_client.post("http://localhost:4000/api/webhooks/mock_send_response",

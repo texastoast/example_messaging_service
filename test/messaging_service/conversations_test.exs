@@ -115,7 +115,8 @@ defmodule MessagingService.ConversationsTest do
       existing_conversation = conversation_fixture()
       insert_conversation_contact(existing_conversation, contact1)
 
-      result = Conversations.find_or_create_conversation_by_contacts([contact1, contact2, contact3])
+      result =
+        Conversations.find_or_create_conversation_by_contacts([contact1, contact2, contact3])
 
       assert result.id != existing_conversation.id
       assert result.id != nil
@@ -136,10 +137,10 @@ defmodule MessagingService.ConversationsTest do
     end
   end
 
-
   defp insert_conversation_contact(conversation, contact) do
     conversation = Repo.preload(conversation, :contacts)
     existing_contacts = conversation.contacts
+
     conversation
     |> Ecto.Changeset.change()
     |> Ecto.Changeset.put_assoc(:contacts, existing_contacts ++ [contact])

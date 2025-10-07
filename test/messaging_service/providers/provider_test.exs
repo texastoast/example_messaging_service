@@ -17,16 +17,17 @@ defmodule MessagingService.Providers.ProviderTest do
       assert url == "http://localhost:4000/api/webhooks/mock_send_response"
       assert opts[:json] == Jason.encode!(message)
 
-      {:ok, %Req.Response{
-        status: 200,
-        body: %{
-          "type" => message["type"],
-          "body" => message["body"],
-          "from" => message["from"],
-          "to" => message["to"],
-          "messaging_provider_id" => Ecto.UUID.generate()
-        }
-      }}
+      {:ok,
+       %Req.Response{
+         status: 200,
+         body: %{
+           "type" => message["type"],
+           "body" => message["body"],
+           "from" => message["from"],
+           "to" => message["to"],
+           "messaging_provider_id" => Ecto.UUID.generate()
+         }
+       }}
     end)
   end
 

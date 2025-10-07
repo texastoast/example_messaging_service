@@ -206,7 +206,8 @@ defmodule MessagingService.ContactsTest do
     test "returns nil when email not found" do
       contact = contact_fixture()
 
-      {phone_id, email_id} = Contacts.get_contact_method_ids(contact, "nonexistent@example.com", "email")
+      {phone_id, email_id} =
+        Contacts.get_contact_method_ids(contact, "nonexistent@example.com", "email")
 
       assert phone_id == nil
       assert email_id == nil
@@ -221,5 +222,4 @@ defmodule MessagingService.ContactsTest do
       assert email_id == nil
     end
   end
-
 end

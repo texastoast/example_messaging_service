@@ -21,16 +21,17 @@ defmodule MessagingService.Providers.SmsTest do
         assert url == "http://localhost:4000/api/webhooks/mock_send_response"
         assert opts[:json] == Jason.encode!(message)
 
-        {:ok, %Req.Response{
-          status: 200,
-          body: %{
-            "type" => "sms",
-            "body" => message["body"],
-            "from" => message["from"],
-            "to" => message["to"],
-            "messaging_provider_id" => Ecto.UUID.generate()
-          }
-        }}
+        {:ok,
+         %Req.Response{
+           status: 200,
+           body: %{
+             "type" => "sms",
+             "body" => message["body"],
+             "from" => message["from"],
+             "to" => message["to"],
+             "messaging_provider_id" => Ecto.UUID.generate()
+           }
+         }}
       end)
 
       result = Sms.send_message(message)
@@ -51,16 +52,17 @@ defmodule MessagingService.Providers.SmsTest do
         assert url == "http://localhost:4000/api/webhooks/mock_send_response"
         assert opts[:json] == Jason.encode!(message)
 
-        {:ok, %Req.Response{
-          status: 200,
-          body: %{
-            "type" => "sms",
-            "body" => message["body"],
-            "from" => message["from"],
-            "to" => message["to"],
-            "messaging_provider_id" => Ecto.UUID.generate()
-          }
-        }}
+        {:ok,
+         %Req.Response{
+           status: 200,
+           body: %{
+             "type" => "sms",
+             "body" => message["body"],
+             "from" => message["from"],
+             "to" => message["to"],
+             "messaging_provider_id" => Ecto.UUID.generate()
+           }
+         }}
       end)
 
       result = Sms.send_message(message)
