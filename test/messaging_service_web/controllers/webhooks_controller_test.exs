@@ -7,6 +7,10 @@ defmodule MessagingServiceWeb.WebhooksControllerTest do
 
   alias MessagingServiceWeb.WebhooksController
   import MessagingService.Fixtures
+  import Mox
+
+  # Make sure mocks are verified when the test exits
+  setup :verify_on_exit!
 
   describe "mock_send_response/2" do
     test "returns JSON response with messaging_provider_id", %{conn: conn} do
@@ -44,6 +48,23 @@ defmodule MessagingServiceWeb.WebhooksControllerTest do
     test "sends SMS message successfully", %{conn: conn} do
       params = sms_message_fixture()
 
+      # Mock the HTTP request
+      expect(MessagingService.HTTPClientMock, :post, fn url, opts ->
+        assert url == "http://localhost:4000/api/webhooks/mock_send_response"
+        assert opts[:json] == Jason.encode!(params)
+
+        {:ok, %Req.Response{
+          status: 200,
+          body: %{
+            "type" => "sms",
+            "body" => params["body"],
+            "from" => params["from"],
+            "to" => params["to"],
+            "messaging_provider_id" => Ecto.UUID.generate()
+          }
+        }}
+      end)
+
       conn = post(conn, ~p"/api/messages/sms", params)
 
       assert json_response(conn, 200)
@@ -55,6 +76,24 @@ defmodule MessagingServiceWeb.WebhooksControllerTest do
     test "sends MMS message successfully", %{conn: conn} do
       params = mms_message_fixture()
 
+      # Mock the HTTP request
+      expect(MessagingService.HTTPClientMock, :post, fn url, opts ->
+        assert url == "http://localhost:4000/api/webhooks/mock_send_response"
+        assert opts[:json] == Jason.encode!(params)
+
+        {:ok, %Req.Response{
+          status: 200,
+          body: %{
+            "type" => "mms",
+            "body" => params["body"],
+            "from" => params["from"],
+            "to" => params["to"],
+            "attachments" => params["attachments"],
+            "messaging_provider_id" => Ecto.UUID.generate()
+          }
+        }}
+      end)
+
       conn = post(conn, ~p"/api/messages/mms", params)
 
       assert json_response(conn, 200)
@@ -65,6 +104,24 @@ defmodule MessagingServiceWeb.WebhooksControllerTest do
 
     test "sends email message successfully", %{conn: conn} do
       params = email_message_fixture()
+
+      # Mock the HTTP request
+      expect(MessagingService.HTTPClientMock, :post, fn url, opts ->
+        assert url == "http://localhost:4000/api/webhooks/mock_send_response"
+        assert opts[:json] == Jason.encode!(params)
+
+        {:ok, %Req.Response{
+          status: 200,
+          body: %{
+            "type" => "email",
+            "body" => params["body"],
+            "from" => params["from"],
+            "to" => params["to"],
+            "subject" => params["subject"],
+            "messaging_provider_id" => Ecto.UUID.generate()
+          }
+        }}
+      end)
 
       conn = post(conn, ~p"/api/messages/email", params)
 
@@ -83,6 +140,26 @@ defmodule MessagingServiceWeb.WebhooksControllerTest do
         "attachments" => ["image.jpg"]
       }
 
+      # Mock the HTTP request
+      expect(MessagingService.HTTPClientMock, :post, fn url, opts ->
+        assert url == "http://localhost:4000/api/webhooks/mock_send_response"
+        # The controller should convert SMS to MMS when attachments are present
+        expected_params = Map.put(params, "type", "mms")
+        assert opts[:json] == Jason.encode!(expected_params)
+
+        {:ok, %Req.Response{
+          status: 200,
+          body: %{
+            "type" => "mms",
+            "body" => params["body"],
+            "from" => params["from"],
+            "to" => params["to"],
+            "attachments" => params["attachments"],
+            "messaging_provider_id" => Ecto.UUID.generate()
+          }
+        }}
+      end)
+
       conn = post(conn, ~p"/api/messages/sms", params)
 
       assert json_response(conn, 200)
@@ -93,17 +170,34 @@ defmodule MessagingServiceWeb.WebhooksControllerTest do
 
     test "handles provider errors", %{conn: conn} do
       params = %{
-        "type" => "invalid_type",
+        "type" => "sms",
         "body" => "Test message",
         "from" => "+1234567890",
         "to" => "+0987654321"
       }
 
+      # Mock the HTTP request to return an error
+      expect(MessagingService.HTTPClientMock, :post, fn url, opts ->
+        assert url == "http://localhost:4000/api/webhooks/mock_send_response"
+        assert opts[:json] == Jason.encode!(params)
+
+        error_response = %Req.Response{
+          status: 400,
+          body: %{
+            "error" => "Bad request",
+            "message" => "Invalid parameters"
+          }
+        }
+
+        {:ok, error_response}
+      end)
+
       conn = post(conn, ~p"/api/messages/sms", params)
 
-      assert json_response(conn, 200)
-      response_data = json_response(conn, 200)
-      assert response_data["type"] == "sms"
+      assert json_response(conn, 400)
+      response_data = json_response(conn, 400)
+      assert response_data["status"] == 400
+      assert response_data["body"]["error"] == "Bad request"
     end
 
     test "handles missing required fields", %{conn: conn} do
@@ -113,6 +207,23 @@ defmodule MessagingServiceWeb.WebhooksControllerTest do
         "from" => "+1234567890",
         "to" => "+0987654321"
       }
+
+      # Mock the HTTP request
+      expect(MessagingService.HTTPClientMock, :post, fn url, opts ->
+        assert url == "http://localhost:4000/api/webhooks/mock_send_response"
+        assert opts[:json] == Jason.encode!(params)
+
+        {:ok, %Req.Response{
+          status: 200,
+          body: %{
+            "type" => "sms",
+            "body" => params["body"],
+            "from" => params["from"],
+            "to" => params["to"],
+            "messaging_provider_id" => Ecto.UUID.generate()
+          }
+        }}
+      end)
 
       conn = post(conn, ~p"/api/messages/sms", params)
 
@@ -154,21 +265,6 @@ defmodule MessagingServiceWeb.WebhooksControllerTest do
       response_data = json_response(conn, 200)
       assert response_data["type"] == "email"
       assert response_data["body"] == params["body"]
-    end
-
-    test "handles provider errors", %{conn: conn} do
-      params = %{
-        "type" => "invalid_type",
-        "body" => "Test message",
-        "from" => "+1234567890",
-        "to" => "+0987654321"
-      }
-
-      conn = post(conn, ~p"/api/webhooks/sms", params)
-
-      assert json_response(conn, 200)
-      response_data = json_response(conn, 200)
-      assert response_data["type"] == "sms"
     end
 
     test "handles missing required fields", %{conn: conn} do

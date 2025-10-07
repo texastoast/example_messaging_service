@@ -7,13 +7,35 @@ defmodule MessagingService.Providers.MmsTest do
 
   alias MessagingService.Providers.Mms
   import MessagingService.Fixtures
+  import Mox
+
+  # Make sure mocks are verified when the test exits
+  setup :verify_on_exit!
+
+  defp mock_http_request(message) do
+    expect(MessagingService.HTTPClientMock, :post, fn url, opts ->
+      assert url == "http://localhost:4000/api/webhooks/mock_send_response"
+      assert opts[:json] == Jason.encode!(message)
+
+      {:ok, %Req.Response{
+        status: 200,
+        body: %{
+          "type" => message["type"],
+          "body" => message["body"],
+          "from" => message["from"],
+          "to" => message["to"],
+          "attachments" => message["attachments"],
+          "messaging_provider_id" => Ecto.UUID.generate()
+        }
+      }}
+    end)
+  end
 
   describe "send_message/1" do
     test "accepts valid MMS message" do
       message = mms_message_fixture()
+      mock_http_request(message)
 
-      # Test that the function exists and can be called
-      # It will likely fail due to HTTP request, but we're testing the function signature
       result = Mms.send_message(message)
       assert is_tuple(result)
       assert elem(result, 0) in [:ok, :error]
@@ -27,8 +49,8 @@ defmodule MessagingService.Providers.MmsTest do
         "to" => "+0987654321",
         "attachments" => ["image1.jpg", "image2.png"]
       }
+      mock_http_request(message)
 
-      # Test that the function exists and can be called
       result = Mms.send_message(message)
       assert is_tuple(result)
       assert elem(result, 0) in [:ok, :error]
@@ -42,8 +64,8 @@ defmodule MessagingService.Providers.MmsTest do
         "to" => "+0987654321",
         "attachments" => []
       }
+      mock_http_request(message)
 
-      # Test that the function exists and can be called
       result = Mms.send_message(message)
       assert is_tuple(result)
       assert elem(result, 0) in [:ok, :error]

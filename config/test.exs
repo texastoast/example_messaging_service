@@ -23,6 +23,9 @@ config :messaging_service, MessagingServiceWeb.Endpoint,
 # In test we don't send emails
 config :messaging_service, MessagingService.Mailer, adapter: Swoosh.Adapters.Test
 
+# Use mock HTTP client in tests
+config :messaging_service, http_client: MessagingService.HTTPClientMock
+
 # Disable swoosh api client as it is only required for production adapters
 config :swoosh, :api_client, false
 

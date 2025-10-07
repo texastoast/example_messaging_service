@@ -7,10 +7,31 @@ defmodule MessagingService.Providers.SmsTest do
 
   alias MessagingService.Providers.Sms
   import MessagingService.Fixtures
+  import Mox
+
+  # Make sure mocks are verified when the test exits
+  setup :verify_on_exit!
 
   describe "send_message/1" do
     test "accepts valid SMS message" do
       message = sms_message_fixture()
+
+      # Mock the HTTP request
+      expect(MessagingService.HTTPClientMock, :post, fn url, opts ->
+        assert url == "http://localhost:4000/api/webhooks/mock_send_response"
+        assert opts[:json] == Jason.encode!(message)
+
+        {:ok, %Req.Response{
+          status: 200,
+          body: %{
+            "type" => "sms",
+            "body" => message["body"],
+            "from" => message["from"],
+            "to" => message["to"],
+            "messaging_provider_id" => Ecto.UUID.generate()
+          }
+        }}
+      end)
 
       result = Sms.send_message(message)
       assert is_tuple(result)
@@ -24,6 +45,23 @@ defmodule MessagingService.Providers.SmsTest do
         "from" => "+1234567890",
         "to" => "+0987654321"
       }
+
+      # Mock the HTTP request
+      expect(MessagingService.HTTPClientMock, :post, fn url, opts ->
+        assert url == "http://localhost:4000/api/webhooks/mock_send_response"
+        assert opts[:json] == Jason.encode!(message)
+
+        {:ok, %Req.Response{
+          status: 200,
+          body: %{
+            "type" => "sms",
+            "body" => message["body"],
+            "from" => message["from"],
+            "to" => message["to"],
+            "messaging_provider_id" => Ecto.UUID.generate()
+          }
+        }}
+      end)
 
       result = Sms.send_message(message)
       assert is_tuple(result)

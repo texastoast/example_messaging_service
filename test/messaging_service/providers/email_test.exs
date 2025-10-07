@@ -7,13 +7,35 @@ defmodule MessagingService.Providers.EmailTest do
 
   alias MessagingService.Providers.Email
   import MessagingService.Fixtures
+  import Mox
+
+  # Make sure mocks are verified when the test exits
+  setup :verify_on_exit!
+
+  defp mock_http_request(message) do
+    expect(MessagingService.HTTPClientMock, :post, fn url, opts ->
+      assert url == "http://localhost:4000/api/webhooks/mock_send_response"
+      assert opts[:json] == Jason.encode!(message)
+
+      {:ok, %Req.Response{
+        status: 200,
+        body: %{
+          "type" => message["type"],
+          "body" => message["body"],
+          "from" => message["from"],
+          "to" => message["to"],
+          "subject" => message["subject"],
+          "messaging_provider_id" => Ecto.UUID.generate()
+        }
+      }}
+    end)
+  end
 
   describe "send_message/1" do
     test "accepts valid email message" do
       message = email_message_fixture()
+      mock_http_request(message)
 
-      # Test that the function exists and can be called
-      # It will likely fail due to HTTP request, but we're testing the function signature
       result = Email.send_message(message)
       assert is_tuple(result)
       assert elem(result, 0) in [:ok, :error]
@@ -27,8 +49,8 @@ defmodule MessagingService.Providers.EmailTest do
         "to" => "recipient@example.com",
         "subject" => "Test Subject"
       }
+      mock_http_request(message)
 
-      # Test that the function exists and can be called
       result = Email.send_message(message)
       assert is_tuple(result)
       assert elem(result, 0) in [:ok, :error]
@@ -41,8 +63,8 @@ defmodule MessagingService.Providers.EmailTest do
         "from" => "sender@example.com",
         "to" => "recipient@example.com"
       }
+      mock_http_request(message)
 
-      # Test that the function exists and can be called
       result = Email.send_message(message)
       assert is_tuple(result)
       assert elem(result, 0) in [:ok, :error]
