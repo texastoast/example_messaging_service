@@ -9,7 +9,11 @@ defmodule MessagingService.ApiHelpersTest do
 
   describe "convert_to_map/1" do
     test "converts Ecto.Association.NotLoaded to nil" do
-      not_loaded = %Ecto.Association.NotLoaded{__cardinality__: :one, __field__: :contact, __owner__: TestSchema}
+      not_loaded = %Ecto.Association.NotLoaded{
+        __cardinality__: :one,
+        __field__: :contact,
+        __owner__: TestSchema
+      }
 
       result = ApiHelpers.convert_to_map(not_loaded)
 
@@ -38,7 +42,11 @@ defmodule MessagingService.ApiHelpersTest do
         id: 1,
         name: "Test",
         __private_field__: "private",
-        not_loaded_assoc: %Ecto.Association.NotLoaded{__cardinality__: :one, __field__: :contact, __owner__: TestSchema},
+        not_loaded_assoc: %Ecto.Association.NotLoaded{
+          __cardinality__: :one,
+          __field__: :contact,
+          __owner__: TestSchema
+        },
         nested_struct: %{__struct__: NestedStruct, value: "nested"}
       }
 
@@ -112,7 +120,11 @@ defmodule MessagingService.ApiHelpersTest do
         id: 1,
         name: "Test",
         nil_field: nil,
-        not_loaded_assoc: %Ecto.Association.NotLoaded{__cardinality__: :one, __field__: :contact, __owner__: TestSchema}
+        not_loaded_assoc: %Ecto.Association.NotLoaded{
+          __cardinality__: :one,
+          __field__: :contact,
+          __owner__: TestSchema
+        }
       }
 
       result = ApiHelpers.convert_to_map(struct)

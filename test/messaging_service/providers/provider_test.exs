@@ -7,10 +7,34 @@ defmodule MessagingService.Providers.ProviderTest do
 
   alias MessagingService.Providers.Provider
   import MessagingService.Fixtures
+  import Mox
+
+  # Make sure mocks are verified when the test exits
+  setup :verify_on_exit!
+
+  defp mock_http_request(message) do
+    expect(MessagingService.HTTPClientMock, :post, fn url, opts ->
+      assert url == "http://localhost:4000/api/webhooks/mock_send_response"
+      assert opts[:json] == Jason.encode!(message)
+
+      {:ok,
+       %Req.Response{
+         status: 200,
+         body: %{
+           "type" => message["type"],
+           "body" => message["body"],
+           "from" => message["from"],
+           "to" => message["to"],
+           "messaging_provider_id" => Ecto.UUID.generate()
+         }
+       }}
+    end)
+  end
 
   describe "send_message/1" do
     test "routes SMS messages to SMS provider" do
       message = sms_message_fixture()
+      mock_http_request(message)
 
       result = Provider.send_message(message)
       assert is_tuple(result)
@@ -20,6 +44,7 @@ defmodule MessagingService.Providers.ProviderTest do
 
     test "routes MMS messages to MMS provider" do
       message = mms_message_fixture()
+      mock_http_request(message)
 
       result = Provider.send_message(message)
       assert is_tuple(result)
@@ -29,6 +54,7 @@ defmodule MessagingService.Providers.ProviderTest do
 
     test "routes email messages to Email provider" do
       message = email_message_fixture()
+      mock_http_request(message)
 
       result = Provider.send_message(message)
       assert is_tuple(result)

@@ -9,7 +9,8 @@ import Config
 
 config :messaging_service,
   ecto_repos: [MessagingService.Repo],
-  generators: [timestamp_type: :utc_datetime, binary_id: true]
+  generators: [timestamp_type: :utc_datetime, binary_id: true],
+  http_client: MessagingService.HTTPClient
 
 # Configures the endpoint
 config :messaging_service, MessagingServiceWeb.Endpoint,
