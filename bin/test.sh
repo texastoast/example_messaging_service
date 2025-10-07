@@ -3,7 +3,7 @@
 # Test script for messaging service endpoints
 # This script tests the local messaging service using the JSON examples from README.md
 
-BASE_URL="http://localhost:8080"
+BASE_URL="http://localhost:4000"
 CONTENT_TYPE="Content-Type: application/json"
 
 echo "=== Testing Messaging Service Endpoints ==="
@@ -97,13 +97,28 @@ curl -X POST "$BASE_URL/api/webhooks/email" \
 
 # Test 7: Get conversations
 echo "7. Testing get conversations..."
-curl -X GET "$BASE_URL/api/conversations" \
+CONVERSATIONS_RESPONSE=$(curl -s -X GET "$BASE_URL/api/conversations" \
   -H "$CONTENT_TYPE" \
-  -w "\nStatus: %{http_code}\n\n"
+  -w "\nStatus: %{http_code}")
 
-# Test 8: Get messages for a conversation (example conversation ID)
+echo "$CONVERSATIONS_RESPONSE"
+echo
+
+# We're using UUIDs for the conversation IDs, so we need to extract the first one.
+FIRST_CONVERSATION_ID=$(echo "$CONVERSATIONS_RESPONSE" | head -n 1 | jq -r '.[0].id // empty')
+
+if [ -z "$FIRST_CONVERSATION_ID" ] || [ "$FIRST_CONVERSATION_ID" = "null" ]; then
+  echo "Error: Could not extract conversation ID from response"
+  echo "Using fallback ID: 1"
+  FIRST_CONVERSATION_ID="1"
+else
+  echo "Extracted conversation ID: $FIRST_CONVERSATION_ID"
+fi
+echo
+
+# Test 8: Get messages for a conversation (using extracted conversation ID)
 echo "8. Testing get messages for conversation..."
-curl -X GET "$BASE_URL/api/conversations/1/messages" \
+curl -X GET "$BASE_URL/api/conversations/$FIRST_CONVERSATION_ID/messages" \
   -H "$CONTENT_TYPE" \
   -w "\nStatus: %{http_code}\n\n"
 
