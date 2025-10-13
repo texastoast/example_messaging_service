@@ -10,5 +10,7 @@ echo "Checking Deps"
 mix deps.get
 echo "Running Migrations"
 mix ecto.migrate
+echo "Seeding Database"
+mix run priv/repo/seeds.exs
 echo "Starting server"
 iex -S mix phx.server
