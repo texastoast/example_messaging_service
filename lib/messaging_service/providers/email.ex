@@ -38,6 +38,7 @@ defmodule MessagingService.Providers.Email do
 
   @impl MessagingService.Providers.Behaviour
   def receive_message(message) do
+    message = Map.put(message, "messaging_provider_id", Map.get(message, "xillio_id"))
     new_message_assocs = Messages.get_new_message_assocs(message)
 
     Repo.insert(
