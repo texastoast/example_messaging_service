@@ -8,5 +8,8 @@ defmodule MessagingService.Repo.Migrations.CreateContactsTable do
 
       timestamps()
     end
+
+    create index(:contacts, [:name])
+    create index(:contacts, [:inserted_at])
   end
 end

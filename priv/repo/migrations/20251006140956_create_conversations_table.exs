@@ -7,5 +7,7 @@ defmodule MessagingService.Repo.Migrations.CreateConversationsTable do
 
       timestamps()
     end
+
+    create index(:conversations, :inserted_at)
   end
 end

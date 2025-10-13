@@ -9,5 +9,9 @@ defmodule MessagingService.Repo.Migrations.CreateContactPhoneNumbersTable do
 
       timestamps()
     end
+
+    create unique_index(:contact_phone_numbers, :number)
+    create index(:contact_phone_numbers, :contact_id)
+    create index(:contact_phone_numbers, :inserted_at)
   end
 end

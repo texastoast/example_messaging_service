@@ -16,5 +16,14 @@ defmodule MessagingService.Repo.Migrations.CreateMessagesTable do
 
       timestamps()
     end
+
+    create index(:messages, :conversation_id)
+    create index(:messages, :inserted_at)
+    create index(:messages, :type)
+    create index(:messages, :messaging_provider_id)
+    create index(:messages, :from_number_id)
+    create index(:messages, :to_number_id)
+    create index(:messages, :from_email_id)
+    create index(:messages, :to_email_id)
   end
 end
