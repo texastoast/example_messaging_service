@@ -24,6 +24,7 @@ defmodule MessagingService.Conversations do
     Message
     |> where(conversation_id: ^conversation_id)
     |> order_by(desc: :inserted_at)
+    |> preload([:from_number, :to_number, :from_email, :to_email])
     |> Repo.all()
   end
 

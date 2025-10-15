@@ -16,13 +16,13 @@ defmodule MessagingService.Contacts do
       Contact
       |> join(:inner, [c], p in ContactPhoneNumber, on: c.id == p.contact_id)
       |> where([c, p], p.number == ^phone_number)
+      |> preload([:contact_phone_numbers, :contact_emails])
       |> Repo.one()
-      |> Repo.preload(:contact_phone_numbers)
 
     if contact do
       contact
     else
-      {:ok, contact} = Repo.insert(%Contact{})
+      {:ok, contact} = Repo.insert(%Contact{name: ""})
       Repo.insert(%ContactPhoneNumber{number: phone_number, contact_id: contact.id})
       Repo.preload(contact, [:contact_phone_numbers, :contact_emails])
     end
@@ -34,15 +34,14 @@ defmodule MessagingService.Contacts do
       Contact
       |> join(:inner, [c], e in ContactEmail, on: c.id == e.contact_id)
       |> where([c, e], e.email == ^email)
+      |> preload([:contact_phone_numbers, :contact_emails])
       |> Repo.one()
-      |> Repo.preload(:contact_emails)
 
     if contact do
       contact
     else
       {:ok, contact} = Repo.insert(%Contact{name: ""})
       Repo.insert(%ContactEmail{email: email, contact_id: contact.id})
-      # Preload the associations for the newly created contact
       Repo.preload(contact, [:contact_phone_numbers, :contact_emails])
     end
   end
